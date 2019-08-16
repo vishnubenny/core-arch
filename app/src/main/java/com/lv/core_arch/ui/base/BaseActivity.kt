@@ -5,13 +5,26 @@ import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import androidx.fragment.app.Fragment
 import dagger.android.AndroidInjection
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.support.HasSupportFragmentInjector
+import javax.inject.Inject
 
 abstract class BaseActivity<T : ViewDataBinding, V : BaseViewModel<*>> :
-    AppCompatActivity() {
+    AppCompatActivity(), HasSupportFragmentInjector {
 
     private var mViewDataBinding: T? = null
     private var mViewModel: V? = null
+
+    /*
+     * Step 1: Rather than injecting the ViewModelFactory
+     * in the activity, we are going to implement the
+     * HasActivityInjector and inject the ViewModelFactory
+     * into our MovieListFragment
+     * */
+    @Inject
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         performDependencyInjection()
@@ -46,4 +59,13 @@ abstract class BaseActivity<T : ViewDataBinding, V : BaseViewModel<*>> :
     abstract fun getViewModel(): V
 
     abstract fun getBindingVariable(): Int
+
+    override fun supportFragmentInjector(): DispatchingAndroidInjector<Fragment> {
+        return dispatchingAndroidInjector
+    }
+
+    fun replaceFragment(fragment: Fragment, containerId: Int) {
+        supportFragmentManager.beginTransaction()
+            .replace(containerId, fragment, fragment::class.java.simpleName).commit()
+    }
 }
