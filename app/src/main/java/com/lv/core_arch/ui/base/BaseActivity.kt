@@ -10,8 +10,8 @@ import dagger.android.AndroidInjection
 abstract class BaseActivity<T : ViewDataBinding, V : BaseViewModel<*>> :
     AppCompatActivity() {
 
-    var mViewDataBinding: T? = null
-    var mViewModel: V? = null
+    private var mViewDataBinding: T? = null
+    private var mViewModel: V? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         performDependencyInjection()
